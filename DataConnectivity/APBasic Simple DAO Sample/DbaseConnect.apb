@@ -1,0 +1,45 @@
+'#Reference {00025E01-0000-0000-C000-000000000046}#5.0#0#C:\Program Files\Common Files\Microsoft Shared\DAO\dao360.dll#Microsoft DAO 3.6 Object Library#DAO
+'------------------------------------------------------------------------------------------------------
+' AP BASIC DATABASE CONNECTIVITY EXAMPLE
+' Created 4/99  by James Williams
+' Audio Precision Tech Support
+'-------------------------------------------------------------------------------------------------------
+' Macro Description:
+' This macro shows how to use the DAO (Data Access Objects) collection to connect to an MS Access Dbase
+
+Public db As DAO.DBEngine 'this sample uses the DAO microsoft jet database engine version 3.5
+
+'Error handling not included for clarity
+
+Sub Main
+Set db = New DBEngine
+
+ChDir MacroDir 'this command sets the present working folder to the folder this macro is in
+
+AP.File.OpenTest("Simple THD.at27")
+
+'Make MS Access Connection
+ Set dbase = db.OpenDatabase("TestDbase.mdb")
+ Set SD = dbase.OpenRecordset("SweepData")
+
+Product = InputBox("Enter Product")
+SerialNo = InputBox("Enter Serial Number")
+AP.Sweep.Start
+Length = AP.Data.ColSize(0,0)                              
+FreqArray = AP.Data.XferToArray(0, 0, "Hz")
+AmplArray = AP.Data.XferToArray(0, 1, "%")
+
+For i = 0 To length -1
+  SD.AddNew
+  SD!Product = Product
+  SD!SerialNo = SerialNo
+  SD!SweepIndex = i
+  SD!Column1 = FreqArray(i)
+  SD!Column2 = AmplArray(i)
+  SD.Update
+ Next i
+MsgBox("data record saved")
+SD.Close
+
+End Sub
+
